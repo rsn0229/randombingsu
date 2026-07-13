@@ -51,6 +51,18 @@
       z-index: 10;
     }
 
+    #capture-wrapper {
+      padding: 60px 80px; 
+      width: 100%;
+      min-width: 520px; 
+      max-width: 640px; 
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: auto;
+    }
+
     .name-inputs { 
       display: flex; 
       flex-direction: column; 
@@ -125,21 +137,22 @@
       background: rgba(43, 58, 66, 0.5);
       backdrop-filter: blur(4px);
       z-index: 100;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       padding: 1rem;
       box-sizing: border-box;
+      overflow-x: auto;
     }
 
-    .modal-content {
-      padding: 2.5rem 1.5rem 1.5rem; 
-      max-width: 450px;
+    .modal-content.paper-note {
       display: flex;
       flex-direction: column;
+      max-width: 440px; 
+      padding: 2.5rem 1.5rem 1.5rem;
     }
 
     .modal-scroll {
-      max-height: 75vh;
+      max-height: 70vh;
       overflow-y: auto;
       scrollbar-width: none;
       display: flex;
@@ -227,6 +240,8 @@
       font-size: 0.95rem;
       border-bottom: 1px dashed #e1f5fe;
       padding-bottom: 8px;
+      word-break: keep-all; 
+      line-height: 1.4;
     }
     .result-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     
@@ -250,8 +265,15 @@
       width: 28px;
       height: 28px;
       margin-left: 8px;
+      flex-shrink: 0;
     }
     .list-svg svg { width: 100%; height: 100%; }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -275,42 +297,47 @@
   </div>
 
   <div class="modal" id="resultModal">
-    <div class="modal-content paper-note">
-      <div class="modal-scroll">
-        <div id="capture-area">
-          <div class="bingsu-visual" id="bingsuVisual">
-            <div class="bowl-container" id="bowlContainer"></div>
-            
-            <div class="ice">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 135" width="100%" height="100%">
-                <defs>
-                  <radialGradient id="iceGrad" cx="35%" cy="30%" r="75%">
-                    <stop offset="0%" stop-color="#ffffff" />
-                    <stop offset="60%" stop-color="#f4fbff" />
-                    <stop offset="100%" stop-color="#b3e5fc" />
-                  </radialGradient>
-                </defs>
-                <path d="M 0 90 A 90 90 0 0 1 180 90 L 180 110 A 90 25 0 0 1 0 110 Z" fill="url(#iceGrad)"/>
-              </svg>
+    <div id="capture-wrapper">
+      <div class="modal-content paper-note">
+        <div class="modal-scroll" id="modalScroll">
+          <div id="capture-area">
+            <div class="bingsu-visual" id="bingsuVisual">
+              <div class="bowl-container" id="bowlContainer"></div>
+              
+              <div class="ice">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 135" width="100%" height="100%">
+                  <defs>
+                    <radialGradient id="iceGrad" cx="35%" cy="30%" r="75%">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="60%" stop-color="#f4fbff" />
+                      <stop offset="100%" stop-color="#b3e5fc" />
+                    </radialGradient>
+                  </defs>
+                  <path d="M 0 90 A 90 90 0 0 1 180 90 L 180 110 A 90 25 0 0 1 0 110 Z" fill="url(#iceGrad)"/>
+                </svg>
+              </div>
+              
             </div>
-            
+            <div class="base-syrup-text" id="baseSyrupText"></div>
+            <ul class="result-list" id="resultList"></ul>
           </div>
-          <div class="base-syrup-text" id="baseSyrupText"></div>
-          <ul class="result-list" id="resultList"></ul>
+          
+          <div class="action-buttons" id="actionButtons">
+            <button class="btn-download" onclick="downloadImage()">추억 남기기</button>
+            <button class="btn-close" onclick="closeModal()">닫기</button>
+          </div>
         </div>
-        
-        <button class="btn-download" onclick="downloadImage()">추억 남기기</button>
-        <button class="btn-close" onclick="closeModal()">닫기</button>
       </div>
     </div>
   </div>
 
   <script>
-function getParticle(word) {
-  const lastChar = word.charCodeAt(word.length - 1);
-  const hasBatchim = (lastChar - 44032) % 28 > 0;
-  return hasBatchim ? '을' : '를';
-}
+    function getParticle(word) {
+      const lastChar = word.charCodeAt(word.length - 1);
+      const hasBatchim = (lastChar - 44032) % 28 > 0;
+      return hasBatchim ? '을' : '를';
+    }
+
     const createSyrupSVG = (id, colorBase, colorFade) => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
@@ -327,10 +354,10 @@ function getParticle(word) {
     const redBeanPath = "M 0,85 C 15,-10 85,-10 100,85 C 95,95 90,100 80,100 C 70,100 65,80 55,80 C 45,80 40,100 30,100 C 20,100 15,80 10,80 C 5,80 2,90 0,85 Z";
 
     const syrupsPreset = [
-      { name: '통팥', bgColor: '#f6f3f0', svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${redBeanPath}" fill="#4E342E"/><circle cx="20" cy="45" r="4" fill="#3E2723"/><circle cx="45" cy="35" r="5" fill="#3E2723"/><circle cx="75" cy="45" r="3.5" fill="#3E2723"/><circle cx="30" cy="65" r="4" fill="#3E2723"/><circle cx="65" cy="55" r="4.5" fill="#3E2723"/></svg>` },
-      { name: '초코시럽', bgColor: '#f4ece8', svg: createSyrupSVG('choco', '#4A2E1B', '#8D6E63') },
-      { name: '딸기시럽', bgColor: '#fff0f3', svg: createSyrupSVG('berry', '#D90429', '#FF8A80') },
-      { name: '연유', bgColor: '#c4d7e6', svg: createSyrupSVG('milk', '#FFF9C4', '#FFFFFF') }
+      { name: '통팥', bgColor: '#f6f3f0', outerBgColor: '#e5ddd5', svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${redBeanPath}" fill="#4E342E"/><circle cx="20" cy="45" r="4" fill="#3E2723"/><circle cx="45" cy="35" r="5" fill="#3E2723"/><circle cx="75" cy="45" r="3.5" fill="#3E2723"/><circle cx="30" cy="65" r="4" fill="#3E2723"/><circle cx="65" cy="55" r="4.5" fill="#3E2723"/></svg>` },
+      { name: '초코시럽', bgColor: '#f4ece8', outerBgColor: '#e0d5ce', svg: createSyrupSVG('choco', '#4A2E1B', '#8D6E63') },
+      { name: '딸기시럽', bgColor: '#fff0f3', outerBgColor: '#ead3d8', svg: createSyrupSVG('berry', '#D90429', '#FF8A80') },
+      { name: '연유', bgColor: '#c4d7e6', outerBgColor: '#a7bdd0', svg: createSyrupSVG('milk', '#FFF9C4', '#FFFFFF') }
     ];
 
     const toppingsPreset = [
@@ -393,6 +420,7 @@ function getParticle(word) {
     ];
 
     let currentBgColor = '#f4fbff';
+    let currentOuterBgColor = '#e1eff7'; 
 
     function removeInput(buttonElement) {
       const container = document.getElementById('nameContainer');
@@ -490,9 +518,10 @@ function getParticle(word) {
       const chosenSyrup = syrupsPreset[baseSyrupIndex];
       
       currentBgColor = chosenSyrup.bgColor;
+      currentOuterBgColor = chosenSyrup.outerBgColor;
       captureArea.style.backgroundColor = currentBgColor;
 
-baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이스!</span>`;
+      baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이스!</span>`;
 
       const syrupDiv = document.createElement('div');
       syrupDiv.className = 'topping-syrup';
@@ -503,7 +532,7 @@ baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이
       const stickMainDirection = globalRand() > 0.5 ? 1 : -1;
       let stickCount = 0;         
       
-const iceCreams = []; 
+      const iceCreams = []; 
       const mochis = [];
       const edgeFruits = []; 
       const edgeToppingsList = []; 
@@ -643,7 +672,7 @@ const iceCreams = [];
         toppingDiv.style.height = `${mochi.size}px`;
         toppingDiv.innerHTML = mochi.svg;
 
- let mLeft, mBottom, mZ, mRot;
+        let mLeft, mBottom, mZ, mRot;
 
         if (iceCreams.length === 0) {
            const minX = 70;
@@ -652,7 +681,7 @@ const iceCreams = [];
 
            mLeft = minX + (idx * step) + (globalRand() * 30 - 15); 
            mLeft = Math.max(minX, Math.min(mLeft, maxX)); 
-           mBottom = 195 + (globalRand() * 25); // 높이 폭도 약간 증가
+           mBottom = 195 + (globalRand() * 25); 
            mZ = 10 + idx;
            mRot = (globalRand() * 90) - 45;
         } else {
@@ -685,22 +714,37 @@ const iceCreams = [];
     }
 
     function downloadImage() {
-      const captureArea = document.getElementById('capture-area');
-      const modalScroll = document.querySelector('.modal-scroll');
+      const captureWrapper = document.getElementById('capture-wrapper'); 
+      const modalScroll = document.getElementById('modalScroll');        
+      const actionButtons = document.getElementById('actionButtons');    
       
-      modalScroll.scrollTop = 0;
+      const originalMaxHeight = modalScroll.style.maxHeight;
+      const originalOverflow = modalScroll.style.overflowY;
+      modalScroll.style.maxHeight = 'none';
+      modalScroll.style.overflowY = 'visible';
 
-      html2canvas(captureArea, {
-        backgroundColor: currentBgColor,
-        scale: 2 
+      actionButtons.style.display = 'none';
+
+      html2canvas(captureWrapper, {
+        backgroundColor: currentOuterBgColor, 
+        scale: 2, 
+        useCORS: true 
       }).then(canvas => {
         const link = document.createElement('a');
         link.download = '우리의_빙수.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
+        
+        modalScroll.style.maxHeight = originalMaxHeight || '';
+        modalScroll.style.overflowY = originalOverflow || '';
+        actionButtons.style.display = 'flex'; 
       }).catch(err => {
         console.error('이미지 저장 중 오류 발생:', err);
         alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
+        
+        modalScroll.style.maxHeight = originalMaxHeight || '';
+        modalScroll.style.overflowY = originalOverflow || '';
+        actionButtons.style.display = 'flex';
       });
     }
   </script>
