@@ -27,14 +27,15 @@
     .paper-note {
       background-color: #fffdf8; 
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-      padding: 2.5rem 2rem 2rem; 
+      /* 💡 좌우 여백을 2rem에서 1.5rem으로 줄여서 모바일에서 내부 공간을 더 넓게 확보 */
+      padding: 2.5rem 1.5rem 2rem; 
       border-radius: 0; 
       box-shadow: 2px 4px 15px rgba(0,0,0,0.06);
       width: 100%;
       max-width: 400px;
       position: relative; 
       border: 1px solid #f2eee8;
-      box-sizing: border-box;
+      box-sizing: border-box; 
     }
 
     .paper-note::before {
@@ -63,7 +64,6 @@
       margin: auto;
     }
 
-    /* 💡 PC 화면(해상도 640px 이상)일 때는 여백을 넉넉하게! */
     @media (min-width: 640px) {
       #capture-wrapper {
         padding: 60px 80px; 
@@ -90,6 +90,7 @@
 
     input[type="text"] {
       flex: 1;
+      min-width: 0; /* 🐛 마법의 코드: input의 기본 최소 너비를 없애서 버튼이 밀려나지 않게 만듦! */
       padding: 12px;
       border: 1px solid #e0dcd5; 
       border-radius: 0; 
@@ -559,7 +560,7 @@
         const particle = getParticle(selectedTopping.name);
 
         const li = document.createElement('li');
-        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span>`;
+        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
         listContainer.appendChild(li);
 
         if (selectedTopping.type === 'stick') {
@@ -726,7 +727,7 @@
       const captureWrapper = document.getElementById('capture-wrapper'); 
       const modalScroll = document.getElementById('modalScroll');        
       const actionButtons = document.getElementById('actionButtons');    
-
+      
       const originalMaxHeight = modalScroll.style.maxHeight;
       const originalOverflow = modalScroll.style.overflowY;
       const originalWidth = captureWrapper.style.width;
@@ -735,7 +736,7 @@
 
       modalScroll.style.maxHeight = 'none';
       modalScroll.style.overflowY = 'visible';
-      actionButtons.style.display = 'none'; 
+      actionButtons.style.display = 'none';
 
       captureWrapper.style.width = '640px';
       captureWrapper.style.maxWidth = '640px';
@@ -751,7 +752,7 @@
         link.download = '우리의_빙수.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-
+        
         modalScroll.style.maxHeight = originalMaxHeight || '';
         modalScroll.style.overflowY = originalOverflow || '';
         captureWrapper.style.width = originalWidth || '';
@@ -761,7 +762,7 @@
       }).catch(err => {
         console.error('이미지 저장 중 오류 발생:', err);
         alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
-
+        
         modalScroll.style.maxHeight = originalMaxHeight || '';
         modalScroll.style.overflowY = originalOverflow || '';
         captureWrapper.style.width = originalWidth || '';
