@@ -503,9 +503,10 @@ baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이
       const stickMainDirection = globalRand() > 0.5 ? 1 : -1;
       let stickCount = 0;         
       
-      const iceCreams = []; 
+const iceCreams = []; 
       const mochis = [];
-
+      const edgeFruits = []; 
+      const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
       let toppingCount = Math.max(2, Math.floor(MAX_TOTAL_FRUITS / names.length));
 
@@ -516,12 +517,12 @@ baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이
         const toppingIndex = Math.floor(rand() * toppingsPreset.length);
         const selectedTopping = toppingsPreset[toppingIndex];
 
-const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
-const particle = getParticle(selectedTopping.name);
+        const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
+        const particle = getParticle(selectedTopping.name);
 
-const li = document.createElement('li');
-li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
-listContainer.appendChild(li);
+        const li = document.createElement('li');
+        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
+        listContainer.appendChild(li);
 
         if (selectedTopping.type === 'stick') {
           const toppingDiv = document.createElement('div');
@@ -542,49 +543,49 @@ listContainer.appendChild(li);
           iceCreams.push(selectedTopping);
         }
         else if (selectedTopping.type === 'top-mochi') {
-          const mochiCount = 4;
+          const mochiCount = 5;
           for (let i = 0; i < mochiCount; i++) {
             mochis.push(selectedTopping);
           }
         }
         else {
-          for (let i = 0; i < toppingCount; i++) {
-            const toppingDiv = document.createElement('div');
-            toppingDiv.className = 'topping-item';
-            toppingDiv.style.width = `${selectedTopping.size}px`;
-            toppingDiv.style.height = `${selectedTopping.size}px`;
-            toppingDiv.style.zIndex = 4; 
-            
-            let posX, posY;
-            let attempts = 0;
-            let overlap = true;
-            
-            while(overlap && attempts < 20) {
-              const minX = 40;
-              const maxX = 220 - selectedTopping.size;
-              posX = minX + (rand() * (maxX - minX)); 
-              
-              let centerPos = posX + (selectedTopping.size / 2);
-              let distanceFromCenter = Math.abs(130 - centerPos);
-              let arcCurve = (distanceFromCenter * distanceFromCenter) / 180; 
-              
-              posY = 85 + arcCurve + (rand() * 15); 
-              
-              overlap = placedPositions.some(pos => Math.hypot(pos.x - posX, pos.y - posY) < 20);
-              attempts++;
-            }
-            placedPositions.push({x: posX, y: posY});
-            
-            toppingDiv.style.left = `${posX}px`;
-            toppingDiv.style.bottom = `${posY}px`;
-            toppingDiv.style.transform = `rotate(${(rand() * 80) - 40}deg)`;
-            
-            let finalSvg = selectedTopping.svgs ? selectedTopping.svgs[Math.floor(rand() * selectedTopping.svgs.length)] : selectedTopping.svg;
-            toppingDiv.innerHTML = finalSvg;
-            
-            visualContainer.appendChild(toppingDiv);
-          }
+          edgeToppingsList.push(selectedTopping);
         }
+      });
+      for (let i = 0; i < toppingCount; i++) {
+        edgeToppingsList.forEach(topping => {
+          edgeFruits.push(topping);
+        });
+      }
+      const totalFruits = edgeFruits.length;
+      edgeFruits.forEach((fruit, idx) => {
+        const toppingDiv = document.createElement('div');
+        toppingDiv.className = 'topping-item';
+        toppingDiv.style.width = `${fruit.size}px`;
+        toppingDiv.style.height = `${fruit.size}px`;
+        toppingDiv.style.zIndex = 4; 
+
+        const minX = 30;
+        const maxX = 230 - fruit.size;
+        const step = totalFruits > 1 ? (maxX - minX) / (totalFruits - 1) : 0;
+        
+        let posX = minX + (idx * step);
+
+        posX += (globalRand() * 30 - 15); 
+        posX = Math.max(minX, Math.min(posX, maxX)); 
+        let centerPos = posX + (fruit.size / 2);
+        let distanceFromCenter = Math.abs(130 - centerPos);
+        let arcCurve = (distanceFromCenter * distanceFromCenter) / 300; 
+        
+        let posY = 85 + arcCurve + (globalRand() * 15); 
+        
+        toppingDiv.style.left = `${posX}px`;
+        toppingDiv.style.bottom = `${posY}px`;
+        toppingDiv.style.transform = `rotate(${(globalRand() * 80) - 40}deg)`;        
+        let finalSvg = fruit.svgs ? fruit.svgs[Math.floor(globalRand() * fruit.svgs.length)] : fruit.svg;
+        toppingDiv.innerHTML = finalSvg;
+        
+        visualContainer.appendChild(toppingDiv);
       });
 
       iceCreams.forEach((iceCream, idx) => {
@@ -634,6 +635,7 @@ listContainer.appendChild(li);
         visualContainer.appendChild(toppingDiv);
       });
 
+      const totalMochis = mochis.length;
       mochis.forEach((mochi, idx) => {
         const toppingDiv = document.createElement('div');
         toppingDiv.className = 'topping-item';
@@ -641,18 +643,28 @@ listContainer.appendChild(li);
         toppingDiv.style.height = `${mochi.size}px`;
         toppingDiv.innerHTML = mochi.svg;
 
-        let mLeft, mBottom, mZ, mRot;
+ let mLeft, mBottom, mZ, mRot;
 
         if (iceCreams.length === 0) {
-           mLeft = 70 + (globalRand() * 80); 
-           mBottom = 190 + (globalRand() * 30); 
+           const minX = 70;
+           const maxX = 190 - mochi.size;
+           const step = totalMochis > 1 ? (maxX - minX) / (totalMochis - 1) : 0;
+
+           mLeft = minX + (idx * step) + (globalRand() * 30 - 15); 
+           mLeft = Math.max(minX, Math.min(mLeft, maxX)); 
+           mBottom = 195 + (globalRand() * 25); // 높이 폭도 약간 증가
            mZ = 10 + idx;
-           mRot = (globalRand() * 80) - 40;
+           mRot = (globalRand() * 90) - 45;
         } else {
-           mLeft = 50 + (globalRand() * 110); 
+           const minX = 50;
+           const maxX = 210 - mochi.size;
+           const step = totalMochis > 1 ? (maxX - minX) / (totalMochis - 1) : 0;
+
+           mLeft = minX + (idx * step) + (globalRand() * 40 - 20);
+           mLeft = Math.max(minX, Math.min(mLeft, maxX));
            mBottom = 180 + (globalRand() * 30); 
            mZ = 14 + idx; 
-           mRot = (globalRand() * 80) - 40;
+           mRot = (globalRand() * 90) - 45;
         }
 
         toppingDiv.style.left = `${mLeft}px`;
@@ -661,6 +673,9 @@ listContainer.appendChild(li);
         toppingDiv.style.transform = `rotate(${mRot}deg)`;
         visualContainer.appendChild(toppingDiv);
       });
+      if (mochis.length > 15) {
+        mochis.length = 15;
+      }
 
       document.getElementById('resultModal').style.display = 'flex';
     }
