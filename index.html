@@ -34,6 +34,7 @@
       max-width: 400px;
       position: relative; 
       border: 1px solid #f2eee8;
+      box-sizing: border-box;
     }
 
     .paper-note::before {
@@ -52,15 +53,21 @@
     }
 
     #capture-wrapper {
-      padding: 60px 80px; 
+      padding: 30px 15px; 
       width: 100%;
-      min-width: 520px; 
       max-width: 640px; 
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
       margin: auto;
+    }
+
+    /* 💡 PC 화면(해상도 640px 이상)일 때는 여백을 넉넉하게! */
+    @media (min-width: 640px) {
+      #capture-wrapper {
+        padding: 60px 80px; 
+      }
     }
 
     .name-inputs { 
@@ -147,8 +154,10 @@
     .modal-content.paper-note {
       display: flex;
       flex-direction: column;
+      width: 100%;
       max-width: 440px; 
       padding: 2.5rem 1.5rem 1.5rem;
+      box-sizing: border-box;
     }
 
     .modal-scroll {
@@ -281,7 +290,7 @@
   <h1>랜덤 빙수</h1>
   <p>이름을 입력하면 빙수 재료를 가져옵니다!</p>
 
-  <div class="input-section paper-note">
+  <div class="input-section paper-note" style="max-width: 400px; margin: 0 auto; box-sizing: border-box;">
     <div class="name-inputs" id="nameContainer">
       <div class="input-row">
         <input type="text" class="name-input" placeholder="이름을 적어주세요">
@@ -550,7 +559,7 @@
         const particle = getParticle(selectedTopping.name);
 
         const li = document.createElement('li');
-        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
+        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span>`;
         listContainer.appendChild(li);
 
         if (selectedTopping.type === 'stick') {
@@ -717,33 +726,47 @@
       const captureWrapper = document.getElementById('capture-wrapper'); 
       const modalScroll = document.getElementById('modalScroll');        
       const actionButtons = document.getElementById('actionButtons');    
-      
+
       const originalMaxHeight = modalScroll.style.maxHeight;
       const originalOverflow = modalScroll.style.overflowY;
+      const originalWidth = captureWrapper.style.width;
+      const originalMaxWidth = captureWrapper.style.maxWidth;
+      const originalPadding = captureWrapper.style.padding;
+
       modalScroll.style.maxHeight = 'none';
       modalScroll.style.overflowY = 'visible';
+      actionButtons.style.display = 'none'; 
 
-      actionButtons.style.display = 'none';
+      captureWrapper.style.width = '640px';
+      captureWrapper.style.maxWidth = '640px';
+      captureWrapper.style.padding = '60px 80px';
 
       html2canvas(captureWrapper, {
         backgroundColor: currentOuterBgColor, 
         scale: 2, 
-        useCORS: true 
+        useCORS: true,
+        windowWidth: 640
       }).then(canvas => {
         const link = document.createElement('a');
         link.download = '우리의_빙수.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        
+
         modalScroll.style.maxHeight = originalMaxHeight || '';
         modalScroll.style.overflowY = originalOverflow || '';
+        captureWrapper.style.width = originalWidth || '';
+        captureWrapper.style.maxWidth = originalMaxWidth || '';
+        captureWrapper.style.padding = originalPadding || '';
         actionButtons.style.display = 'flex'; 
       }).catch(err => {
         console.error('이미지 저장 중 오류 발생:', err);
         alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
-        
+
         modalScroll.style.maxHeight = originalMaxHeight || '';
         modalScroll.style.overflowY = originalOverflow || '';
+        captureWrapper.style.width = originalWidth || '';
+        captureWrapper.style.maxWidth = originalMaxWidth || '';
+        captureWrapper.style.padding = originalPadding || '';
         actionButtons.style.display = 'flex';
       });
     }
