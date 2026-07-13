@@ -306,6 +306,11 @@
   </div>
 
   <script>
+function getParticle(word) {
+  const lastChar = word.charCodeAt(word.length - 1);
+  const hasBatchim = (lastChar - 44032) % 28 > 0;
+  return hasBatchim ? '을' : '를';
+}
     const createSyrupSVG = (id, colorBase, colorFade) => `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
@@ -487,8 +492,8 @@
       currentBgColor = chosenSyrup.bgColor;
       captureArea.style.backgroundColor = currentBgColor;
 
-      baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이스!</span> <span class="list-svg" style="width:35px;">${chosenSyrup.svg}</span>`;
-      
+baseSyrupText.innerHTML = `<span>✨ <strong>${chosenSyrup.name}</strong> 베이스!</span>`;
+
       const syrupDiv = document.createElement('div');
       syrupDiv.className = 'topping-syrup';
       syrupDiv.innerHTML = chosenSyrup.svg;
@@ -511,11 +516,12 @@
         const toppingIndex = Math.floor(rand() * toppingsPreset.length);
         const selectedTopping = toppingsPreset[toppingIndex];
 
-        const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
+const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
+const particle = getParticle(selectedTopping.name);
 
-        const li = document.createElement('li');
-        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>(을)를 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
-        listContainer.appendChild(li);
+const li = document.createElement('li');
+li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
+listContainer.appendChild(li);
 
         if (selectedTopping.type === 'stick') {
           const toppingDiv = document.createElement('div');
