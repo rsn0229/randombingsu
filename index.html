@@ -597,9 +597,9 @@
           toppingDiv.innerHTML = selectedTopping.svg;
           
           let baseLeft = stickMainDirection === 1 ? 160 : 60; 
-          toppingDiv.style.left = `${baseLeft + (stickCount * 8 * stickMainDirection)}px`;
-          toppingDiv.style.transform = `rotate(${15 * stickMainDirection + (stickCount * 3)}deg)`;
-          toppingDiv.style.bottom = '170px'; 
+          toppingDiv.style.left = `${baseLeft + (stickCount * 14 * stickMainDirection)}px`;
+          toppingDiv.style.transform = `rotate(${15 * stickMainDirection + (stickCount * 4 * stickMainDirection)}deg)`;
+          toppingDiv.style.bottom = `${170 - (stickCount * 3)}px`;
           
           visualContainer.appendChild(toppingDiv);
           stickCount++;
