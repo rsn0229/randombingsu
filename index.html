@@ -574,7 +574,6 @@
       const edgeFruits = []; 
       const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
-      let toppingCount = Math.max(2, Math.floor(MAX_TOTAL_FRUITS / names.length));
 
       names.forEach((name, index) => {
         const mySeed = getHash(groupHashString + '_' + name + '_' + index);
@@ -587,7 +586,7 @@
         const particle = getParticle(selectedTopping.name);
 
         const li = document.createElement('li');
-        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span>`;
+        li.innerHTML = `<span><strong>${name}</strong>님이 <strong>${selectedTopping.name}</strong>${particle} 가져왔습니다!</span> <span class="list-svg">${listIconSvg}</span>`;
         listContainer.appendChild(li);
 
         if (selectedTopping.type === 'stick') {
@@ -619,10 +618,13 @@
         }
       });
 
-      for (let i = 0; i < toppingCount; i++) {
-        edgeToppingsList.forEach(topping => {
-          edgeFruits.push(topping);
-        });
+      if (edgeToppingsList.length > 0) {
+        let fruitMultiplier = Math.max(2, Math.floor(MAX_TOTAL_FRUITS / edgeToppingsList.length));
+        for (let i = 0; i < fruitMultiplier; i++) {
+          edgeToppingsList.forEach(topping => {
+            edgeFruits.push(topping);
+          });
+        }
       }
 
       const totalFruits = edgeFruits.length;
