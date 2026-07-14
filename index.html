@@ -743,6 +743,11 @@
         visualContainer.appendChild(toppingDiv);
       });
 
+      for (let i = mochis.length - 1; i > 0; i--) {
+        const j = Math.floor(globalRand() * (i + 1));
+        [mochis[i], mochis[j]] = [mochis[j], mochis[i]];
+      }
+
       const totalMochis = mochis.length;
       mochis.forEach((mochi, idx) => {
         const toppingDiv = document.createElement('div');
