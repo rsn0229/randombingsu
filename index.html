@@ -725,8 +725,8 @@
         visualContainer.appendChild(toppingDiv);
       });
 
-      let highestPeakY = 235; 
-      let highestPeakX = 130 - 20;
+      let iceCreamPeakY = 0; 
+      let iceCreamPeakX = 130 - 20;
       iceCreams.forEach((iceCream, idx) => {
         const toppingDiv = document.createElement('div');
         toppingDiv.className = 'topping-item';
@@ -770,9 +770,9 @@
           toppingDiv.style.bottom = `${currentBottom}px`;
         }
 
-        if (currentBottom >= highestPeakY) {
-          highestPeakY = currentBottom;
-          highestPeakX = currentLeft + (iceCream.size / 2) - 15;
+        if (currentBottom >= iceCreamPeakY) {
+          iceCreamPeakY = currentBottom;
+          iceCreamPeakX = currentLeft + (iceCream.size / 2) - 20;
         }
 
         visualContainer.appendChild(toppingDiv);
@@ -835,8 +835,11 @@
         let offsetX = (idx * 8) - ((cherries.length - 1) * 4);
         let offsetY = idx * 3; 
 
-        toppingDiv.style.left = `${highestPeakX + offsetX}px`;
-        toppingDiv.style.bottom = `${highestPeakY + (iceCreams.length > 0 ? 45 : 0) + offsetY}px`;
+        let finalLeft = iceCreams.length > 0 ? iceCreamPeakX : (130 - 20);
+        let finalBottom = iceCreams.length > 0 ? (iceCreamPeakY + 45) : 235;
+
+        toppingDiv.style.left = `${finalLeft + offsetX}px`;
+        toppingDiv.style.bottom = `${finalBottom + offsetY}px`;
         toppingDiv.style.zIndex = 50 + idx;        visualContainer.appendChild(toppingDiv);
       });
 
