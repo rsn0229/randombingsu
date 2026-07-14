@@ -478,6 +478,30 @@
           createJellySVG('#E2CBF7')
         ] 
       },
+      {
+        name: '체리', type: 'top-point', size: 30,
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+                <circle cx="20" cy="25" r="9" fill="#800000"/>
+                <path d="M 20 16 Q 25 5 32 8" fill="none" stroke="#33691E" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="17" cy="22" r="2.5" fill="#ffffff" opacity="0.4"/>
+              </svg>`
+      },
+      {
+        name: '초콜릿', type: 'stick', size: 90, width: 45,
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 100">
+                <g transform="rotate(5) translate(10, 10)">
+                  <rect width="32" height="75" x="0" fill="#4E342E" rx="3"/>
+                  <rect width="12" height="15" x="3" y="3" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="17" y="3" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="3" y="21" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="17" y="21" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="3" y="39" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="17" y="39" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="3" y="57" fill="#3E2723" rx="1.5"/>
+                  <rect width="12" height="15" x="17" y="57" fill="#3E2723" rx="1.5"/>
+                </g>
+              </svg>`
+      },
       { 
         name: '막대 과자', type: 'stick', size: 90, 
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 100">
@@ -608,7 +632,9 @@
       let stickCount = 0;         
       
       const iceCreams = []; 
-      const mochis = [];
+      const scatterItems = []; 
+      const cherries = []; 
+      
       const edgeFruits = []; 
       const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
@@ -630,14 +656,14 @@
         if (selectedTopping.type === 'stick') {
           const toppingDiv = document.createElement('div');
           toppingDiv.className = 'topping-stick';
-          toppingDiv.style.width = '40px'; 
+          toppingDiv.style.width = selectedTopping.width ? `${selectedTopping.width}px` : '40px'; 
           toppingDiv.style.height = `${selectedTopping.size}px`;
           toppingDiv.innerHTML = selectedTopping.svg;
           
           let baseLeft = stickMainDirection === 1 ? 160 : 60; 
-          toppingDiv.style.left = `${baseLeft + (stickCount * 14 * stickMainDirection)}px`;
-          toppingDiv.style.transform = `rotate(${15 * stickMainDirection + (stickCount * 4 * stickMainDirection)}deg)`;
-          toppingDiv.style.bottom = `${170 - (stickCount * 3)}px`;
+          toppingDiv.style.left = `${baseLeft + (stickCount * 18 * stickMainDirection)}px`;
+          toppingDiv.style.transform = `rotate(${15 * stickMainDirection + (stickCount * 8 * stickMainDirection)}deg)`;
+          toppingDiv.style.bottom = `${170 - (stickCount * 4)}px`;
           
           visualContainer.appendChild(toppingDiv);
           stickCount++;
@@ -648,8 +674,11 @@
         else if (selectedTopping.type === 'top-mochi' || selectedTopping.type === 'top-jelly') {
           const scatterCount = 5;
           for (let i = 0; i < scatterCount; i++) {
-            mochis.push(selectedTopping);
+            scatterItems.push(selectedTopping);
           }
+        }
+        else if (selectedTopping.type === 'top-point') {
+          cherries.push(selectedTopping);
         }
         else {
           edgeToppingsList.push(selectedTopping);
@@ -696,6 +725,8 @@
         visualContainer.appendChild(toppingDiv);
       });
 
+      let highestPeakY = 235; 
+      let highestPeakX = 130 - 15;
       iceCreams.forEach((iceCream, idx) => {
         const toppingDiv = document.createElement('div');
         toppingDiv.className = 'topping-item';
@@ -703,67 +734,71 @@
         toppingDiv.style.height = `${iceCream.size}px`;
         toppingDiv.innerHTML = iceCream.svg;
 
+        let currentLeft, currentBottom;
+
         if (iceCreams.length === 1) {
-          toppingDiv.style.left = stickMainDirection === 1 ? '70px' : '125px'; 
-          toppingDiv.style.bottom = '220px';
+          currentLeft = stickMainDirection === 1 ? 70 : 125;
+          currentBottom = 220;
+          toppingDiv.style.left = `${currentLeft}px`; 
+          toppingDiv.style.bottom = `${currentBottom}px`;
           toppingDiv.style.transform = stickMainDirection === 1 ? 'rotate(-10deg)' : 'rotate(10deg)';
         } 
         else if (iceCreams.length === 2) {
           if (idx === 0) {
-            toppingDiv.style.left = '75px';
-            toppingDiv.style.bottom = '215px';
+            currentLeft = 75; currentBottom = 215;
             toppingDiv.style.zIndex = 9; 
             toppingDiv.style.transform = 'rotate(-10deg)';
           } else {
-            toppingDiv.style.left = '120px';
-            toppingDiv.style.bottom = '220px';
+            currentLeft = 120; currentBottom = 220;
             toppingDiv.style.zIndex = 10; 
             toppingDiv.style.transform = 'rotate(10deg)';
           }
+          toppingDiv.style.left = `${currentLeft}px`;
+          toppingDiv.style.bottom = `${currentBottom}px`;
         } 
         else {
           if (idx === 0) {
-            toppingDiv.style.left = '70px';
-            toppingDiv.style.bottom = '215px';
-            toppingDiv.style.zIndex = 9;
+            currentLeft = 70; currentBottom = 215; toppingDiv.style.zIndex = 9;
           } else if (idx === 1) {
-            toppingDiv.style.left = '125px';
-            toppingDiv.style.bottom = '210px';
-            toppingDiv.style.zIndex = 10;
+            currentLeft = 125; currentBottom = 210; toppingDiv.style.zIndex = 10;
           } else if (idx === 2) {
-            toppingDiv.style.left = '95px';
-            toppingDiv.style.bottom = '235px';
-            toppingDiv.style.zIndex = 11;
+            currentLeft = 95; currentBottom = 235; toppingDiv.style.zIndex = 11;
           } else {
-            toppingDiv.style.left = `${95 + (idx*2)}px`;
-            toppingDiv.style.bottom = `${235 + (idx*5)}px`;
-            toppingDiv.style.zIndex = 8 - idx; 
+            currentLeft = 95 + (idx*2); currentBottom = 235 + (idx*5); toppingDiv.style.zIndex = 8 - idx; 
           }
+          toppingDiv.style.left = `${currentLeft}px`;
+          toppingDiv.style.bottom = `${currentBottom}px`;
         }
+
+        if (currentBottom >= highestPeakY) {
+          highestPeakY = currentBottom;
+          highestPeakX = currentLeft + (iceCream.size / 2) - 15;
+        }
+
         visualContainer.appendChild(toppingDiv);
       });
 
-      for (let i = mochis.length - 1; i > 0; i--) {
+      for (let i = scatterItems.length - 1; i > 0; i--) {
         const j = Math.floor(globalRand() * (i + 1));
-        [mochis[i], mochis[j]] = [mochis[j], mochis[i]];
+        [scatterItems[i], scatterItems[j]] = [scatterItems[j], scatterItems[i]];
       }
 
-      const totalMochis = mochis.length;
-      mochis.forEach((mochi, idx) => {
+      const totalScatter = scatterItems.length;
+      scatterItems.forEach((item, idx) => {
         const toppingDiv = document.createElement('div');
         toppingDiv.className = 'topping-item';
-        toppingDiv.style.width = `${mochi.size}px`;
-        toppingDiv.style.height = `${mochi.size}px`;
+        toppingDiv.style.width = `${item.size}px`;
+        toppingDiv.style.height = `${item.size}px`;
         
-        let finalSvg = mochi.svgs ? mochi.svgs[Math.floor(globalRand() * mochi.svgs.length)] : mochi.svg;
+        let finalSvg = item.svgs ? item.svgs[Math.floor(globalRand() * item.svgs.length)] : item.svg;
         toppingDiv.innerHTML = finalSvg;
 
         let mLeft, mBottom, mZ, mRot;
 
         if (iceCreams.length === 0) {
            const minX = 70;
-           const maxX = 190 - mochi.size;
-           const step = totalMochis > 1 ? (maxX - minX) / (totalMochis - 1) : 0;
+           const maxX = 190 - item.size;
+           const step = totalScatter > 1 ? (maxX - minX) / (totalScatter - 1) : 0;
 
            mLeft = minX + (idx * step) + (globalRand() * 30 - 15); 
            mLeft = Math.max(minX, Math.min(mLeft, maxX)); 
@@ -772,8 +807,8 @@
            mRot = (globalRand() * 90) - 45;
         } else {
            const minX = 50;
-           const maxX = 210 - mochi.size;
-           const step = totalMochis > 1 ? (maxX - minX) / (totalMochis - 1) : 0;
+           const maxX = 210 - item.size;
+           const step = totalScatter > 1 ? (maxX - minX) / (totalScatter - 1) : 0;
 
            mLeft = minX + (idx * step) + (globalRand() * 40 - 20);
            mLeft = Math.max(minX, Math.min(mLeft, maxX));
@@ -788,9 +823,22 @@
         toppingDiv.style.transform = `rotate(${mRot}deg)`;
         visualContainer.appendChild(toppingDiv);
       });
-      if (mochis.length > 15) {
-        mochis.length = 15;
+      if (scatterItems.length > 15) {
+        scatterItems.length = 15;
       }
+      cherries.forEach((cherry, idx) => {
+        const toppingDiv = document.createElement('div');
+        toppingDiv.className = 'topping-item';
+        toppingDiv.style.width = `${cherry.size}px`;
+        toppingDiv.style.height = `${cherry.size}px`;
+        toppingDiv.innerHTML = cherry.svg;
+        let offsetX = (idx * 8) - ((cherries.length - 1) * 4);
+        let offsetY = idx * 3; 
+
+        toppingDiv.style.left = `${highestPeakX + offsetX}px`;
+        toppingDiv.style.bottom = `${highestPeakY + (iceCreams.length > 0 ? 45 : 0) + offsetY}px`;
+        toppingDiv.style.zIndex = 50 + idx;        visualContainer.appendChild(toppingDiv);
+      });
 
       document.getElementById('resultModal').style.display = 'flex';
     }
