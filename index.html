@@ -37,11 +37,10 @@
       box-sizing: border-box; 
     }
 
-    .paper-note::before {
-      content: '';
+    .masking-tape {
       position: absolute;
       top: -12px;
-      left: 50%; 
+      left: 50%;
       margin-left: -50px;
       transform: rotate(-2deg);
       width: 100px;
@@ -292,6 +291,7 @@
   <p>이름을 입력하면 빙수 재료를 가져옵니다!</p>
 
   <div class="input-section paper-note" style="max-width: 400px; margin: 0 auto; box-sizing: border-box;">
+    <div class="masking-tape"></div>
     <div class="name-inputs" id="nameContainer">
       <div class="input-row">
         <input type="text" class="name-input" placeholder="이름을 적어주세요">
@@ -309,6 +309,7 @@
   <div class="modal" id="resultModal">
     <div id="capture-wrapper">
       <div class="modal-content paper-note">
+        <div class="masking-tape"></div> 
         <div class="modal-scroll" id="modalScroll">
           <div id="capture-area">
             <div class="bingsu-visual" id="bingsuVisual">
