@@ -283,6 +283,20 @@
       flex-direction: column;
       width: 100%;
     }
+
+    .fallback-link {
+      font-size: 0.8rem;
+      color: #9ba6b2;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-align: center;
+      margin-top: 5px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .fallback-link:hover {
+      color: #6a7c8e;
+    }
   </style>
 </head>
 <body>
@@ -334,8 +348,9 @@
           </div>
           
           <div class="action-buttons" id="actionButtons">
-            <button class="btn-download" onclick="downloadImage()">추억 남기기</button>
+            <button class="btn-download" onclick="downloadImage(false)">추억 남기기</button>
             <button class="btn-close" onclick="closeModal()">닫기</button>
+            <a href="#" class="fallback-link" onclick="downloadImage(true); return false;">이미지가 까맣게 저장되는 경우(다운로드)</a>
           </div>
         </div>
       </div>
@@ -858,16 +873,22 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
-    function downloadImage() {
+    function downloadImage(useFallback = false) {
       const captureWrapper = document.getElementById('capture-wrapper'); 
       const modalScroll = document.getElementById('modalScroll');        
       const actionButtons = document.getElementById('actionButtons');    
+      
+      const paperNote = captureWrapper.querySelector('.modal-content.paper-note');
+      const captureArea = captureWrapper.querySelector('#capture-area');
       
       const originalMaxHeight = modalScroll.style.maxHeight;
       const originalOverflow = modalScroll.style.overflowY;
       const originalWidth = captureWrapper.style.width;
       const originalMaxWidth = captureWrapper.style.maxWidth;
       const originalPadding = captureWrapper.style.padding;
+      
+      let originalPaperBg = '';
+      let originalCaptureBg = '';
 
       modalScroll.style.maxHeight = 'none';
       modalScroll.style.overflowY = 'visible';
@@ -876,6 +897,13 @@
       captureWrapper.style.width = '640px';
       captureWrapper.style.maxWidth = '640px';
       captureWrapper.style.padding = '60px 80px';
+
+      if (useFallback) {
+        originalPaperBg = paperNote.style.backgroundImage;
+        originalCaptureBg = captureArea.style.backgroundImage;
+        paperNote.style.backgroundImage = 'none';
+        captureArea.style.backgroundImage = 'none';
+      }
       
       setTimeout(() => {
         html2canvas(captureWrapper, {
@@ -894,6 +922,11 @@
           captureWrapper.style.width = originalWidth || '';
           captureWrapper.style.maxWidth = originalMaxWidth || '';
           captureWrapper.style.padding = originalPadding || '';
+
+          if (useFallback) {
+            paperNote.style.backgroundImage = originalPaperBg || '';
+            captureArea.style.backgroundImage = originalCaptureBg || '';
+          }
           actionButtons.style.display = 'flex'; 
         }).catch(err => {
           console.error('이미지 저장 중 오류 발생:', err);
@@ -904,6 +937,11 @@
           captureWrapper.style.width = originalWidth || '';
           captureWrapper.style.maxWidth = originalMaxWidth || '';
           captureWrapper.style.padding = originalPadding || '';
+          
+          if (useFallback) {
+            paperNote.style.backgroundImage = originalPaperBg || '';
+            captureArea.style.backgroundImage = originalCaptureBg || '';
+          }
           actionButtons.style.display = 'flex';
         });
       }, 100);
