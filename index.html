@@ -639,12 +639,23 @@
       const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
 
+      let hasCherry = false;
+
       names.forEach((name, index) => {
         const mySeed = getHash(groupHashString + '_' + name + '_' + index);
         const rand = createRandomGenerator(mySeed);
 
-        const toppingIndex = Math.floor(rand() * toppingsPreset.length);
-        const selectedTopping = toppingsPreset[toppingIndex];
+        let toppingIndex = Math.floor(rand() * toppingsPreset.length);
+        let selectedTopping = toppingsPreset[toppingIndex];
+
+        if (selectedTopping.type === 'top-point') {
+          if (hasCherry) {
+            toppingIndex = (toppingIndex + 1) % toppingsPreset.length;
+            selectedTopping = toppingsPreset[toppingIndex];
+          } else {
+            hasCherry = true;
+          }
+        }
 
         const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
         const particle = getParticle(selectedTopping.name);
