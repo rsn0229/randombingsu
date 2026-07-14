@@ -771,35 +771,37 @@
       captureWrapper.style.width = '640px';
       captureWrapper.style.maxWidth = '640px';
       captureWrapper.style.padding = '60px 80px';
-
-      html2canvas(captureWrapper, {
-        backgroundColor: currentOuterBgColor, 
-        scale: 2, 
-        useCORS: true,
-        windowWidth: 640
-      }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = '우리의_빙수.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        
-        modalScroll.style.maxHeight = originalMaxHeight || '';
-        modalScroll.style.overflowY = originalOverflow || '';
-        captureWrapper.style.width = originalWidth || '';
-        captureWrapper.style.maxWidth = originalMaxWidth || '';
-        captureWrapper.style.padding = originalPadding || '';
-        actionButtons.style.display = 'flex'; 
-      }).catch(err => {
-        console.error('이미지 저장 중 오류 발생:', err);
-        alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
-        
-        modalScroll.style.maxHeight = originalMaxHeight || '';
-        modalScroll.style.overflowY = originalOverflow || '';
-        captureWrapper.style.width = originalWidth || '';
-        captureWrapper.style.maxWidth = originalMaxWidth || '';
-        captureWrapper.style.padding = originalPadding || '';
-        actionButtons.style.display = 'flex';
-      });
+      
+      setTimeout(() => {
+        html2canvas(captureWrapper, {
+          backgroundColor: currentOuterBgColor, 
+          scale: 2, 
+          useCORS: true,
+          windowWidth: 640
+        }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = '우리의_빙수.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          
+          modalScroll.style.maxHeight = originalMaxHeight || '';
+          modalScroll.style.overflowY = originalOverflow || '';
+          captureWrapper.style.width = originalWidth || '';
+          captureWrapper.style.maxWidth = originalMaxWidth || '';
+          captureWrapper.style.padding = originalPadding || '';
+          actionButtons.style.display = 'flex'; 
+        }).catch(err => {
+          console.error('이미지 저장 중 오류 발생:', err);
+          alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
+          
+          modalScroll.style.maxHeight = originalMaxHeight || '';
+          modalScroll.style.overflowY = originalOverflow || '';
+          captureWrapper.style.width = originalWidth || '';
+          captureWrapper.style.maxWidth = originalMaxWidth || '';
+          captureWrapper.style.padding = originalPadding || '';
+          actionButtons.style.display = 'flex';
+        });
+      }, 100);
     }
   </script>
 </body>
