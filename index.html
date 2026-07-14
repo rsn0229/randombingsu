@@ -479,11 +479,14 @@
         ] 
       },
       {
-        name: '체리', type: 'top-point', size: 40,
-        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-                <circle cx="20" cy="25" r="9" fill="#800000"/>
-                <path d="M 20 16 Q 25 5 32 8" fill="none" stroke="#33691E" stroke-width="1.5" stroke-linecap="round"/>
-                <circle cx="17" cy="22" r="2.5" fill="#ffffff" opacity="0.4"/>
+        name: '체리', type: 'top-point', size: 45,
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 40">
+                <path d="M 17 18 Q 23 4 32 8" fill="none" stroke="#33691E" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="17" cy="26" r="8" fill="#800000"/>
+                <circle cx="14" cy="23" r="2.5" fill="#ffffff" opacity="0.4"/>
+                <path d="M 27 16 Q 29 6 32 8" fill="none" stroke="#33691E" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="27" cy="24" r="8" fill="#800000"/>
+                <circle cx="24" cy="21" r="2.5" fill="#ffffff" opacity="0.4"/>
               </svg>`
       },
       {
@@ -639,23 +642,12 @@
       const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
 
-      let hasCherry = false;
-
       names.forEach((name, index) => {
         const mySeed = getHash(groupHashString + '_' + name + '_' + index);
         const rand = createRandomGenerator(mySeed);
 
-        let toppingIndex = Math.floor(rand() * toppingsPreset.length);
-        let selectedTopping = toppingsPreset[toppingIndex];
-
-        if (selectedTopping.type === 'top-point') {
-          if (hasCherry) {
-            toppingIndex = (toppingIndex + 1) % toppingsPreset.length;
-            selectedTopping = toppingsPreset[toppingIndex];
-          } else {
-            hasCherry = true;
-          }
-        }
+        const toppingIndex = Math.floor(rand() * toppingsPreset.length);
+        const selectedTopping = toppingsPreset[toppingIndex];
 
         const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
         const particle = getParticle(selectedTopping.name);
@@ -837,22 +829,27 @@
       if (scatterItems.length > 15) {
         scatterItems.length = 15;
       }
-      cherries.forEach((cherry, idx) => {
+
+      if (cherries.length > 0) {
         const toppingDiv = document.createElement('div');
         toppingDiv.className = 'topping-item';
-        toppingDiv.style.width = `${cherry.size}px`;
-        toppingDiv.style.height = `${cherry.size}px`;
-        toppingDiv.innerHTML = cherry.svg;
-        let offsetX = (idx * 8) - ((cherries.length - 1) * 4);
-        let offsetY = idx * 3; 
+
+        toppingDiv.style.width = `${cherries[0].size}px`;
+        toppingDiv.style.height = '40px';
+        toppingDiv.innerHTML = cherries[0].svg;
+
+        let offsetX = 0; 
+        let offsetY = 0; 
 
         let finalLeft = iceCreams.length > 0 ? iceCreamPeakX : (130 - 20);
         let finalBottom = iceCreams.length > 0 ? (iceCreamPeakY + 35) : 235;
 
         toppingDiv.style.left = `${finalLeft + offsetX}px`;
         toppingDiv.style.bottom = `${finalBottom + offsetY}px`;
-        toppingDiv.style.zIndex = 50 + idx;        visualContainer.appendChild(toppingDiv);
-      });
+        toppingDiv.style.zIndex = 50;
+        
+        visualContainer.appendChild(toppingDiv);
+      }
 
       document.getElementById('resultModal').style.display = 'flex';
     }
