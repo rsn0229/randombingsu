@@ -329,18 +329,9 @@
             <div class="bingsu-visual" id="bingsuVisual">
               <div class="bowl-container" id="bowlContainer"></div>
               
-              <div class="ice">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 135" width="100%" height="100%">
-                  <defs>
-                    <radialGradient id="iceGrad" cx="35%" cy="30%" r="75%">
-                      <stop offset="0%" stop-color="#ffffff" />
-                      <stop offset="60%" stop-color="#f4fbff" />
-                      <stop offset="100%" stop-color="#b3e5fc" />
-                    </radialGradient>
-                  </defs>
-                  <path d="M 0 90 A 90 90 0 0 1 180 90 L 180 110 A 90 25 0 0 1 0 110 Z" fill="url(#iceGrad)"/>
-                </svg>
-              </div>
+<div class="ice">
+  <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 135' width='100%25' height='100%25'%3E%3Cdefs%3E%3CradialGradient id='iceGrad' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' /%3E%3Cstop offset='60%25' stop-color='%23f4fbff' /%3E%3Cstop offset='100%25' stop-color='%23b3e5fc' /%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M 0 90 A 90 90 0 0 1 180 90 L 180 110 A 90 25 0 0 1 0 110 Z' fill='url(%23iceGrad)'/%3E%3C/svg%3E" style="width: 100%; height: 100%; display: block;" alt="ice" />
+</div>
               
             </div>
             <div class="base-syrup-text" id="baseSyrupText"></div>
@@ -601,31 +592,31 @@ const syrupsPreset = [
       const baseSyrupText = document.getElementById('baseSyrupText');
       const captureArea = document.getElementById('capture-area');
       const bowlContainer = document.getElementById('bowlContainer');
-      
-      bowlContainer.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="110" viewBox="0 0 200 110">
-          <path d="M 65 100 L 135 100 C 142 100 145 102 145 105 L 145 108 C 145 109 144 110 142 110 L 58 110 C 56 110 55 109 55 108 L 55 105 C 55 102 58 100 65 100 Z" fill="rgba(255,255,255,0.85)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
-          <rect x="90" y="68" width="20" height="34" fill="rgba(255,255,255,0.85)"/>
-          <line x1="90" y1="70" x2="90" y2="100" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-          <line x1="110" y1="70" x2="110" y2="100" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-          <defs>
-            <linearGradient id="glassGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-              <stop offset="20%" stop-color="#ffffff" stop-opacity="0.6"/>
-              <stop offset="50%" stop-color="#e1f5fe" stop-opacity="0.75"/>
-              <stop offset="80%" stop-color="#ffffff" stop-opacity="0.6"/>
-              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95"/>
-            </linearGradient>
-            <pattern id="frostPattern" width="3" height="3" patternUnits="userSpaceOnUse">
-              <circle cx="1.5" cy="1.5" r="1" fill="rgba(255, 255, 255, 0.4)"/>
-            </pattern>
-          </defs>
-          <path d="M 5 0 L 195 0 A 5 5 0 0 1 200 5 A 100 65 0 0 1 0 5 A 5 5 0 0 1 5 0 Z" fill="url(#glassGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
-          <path d="M 5 0 L 195 0 A 5 5 0 0 1 200 5 A 100 65 0 0 1 0 5 A 5 5 0 0 1 5 0 Z" fill="url(#frostPattern)"/>
-          <path d="M 15 15 A 85 55 0 0 0 50 60" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M 185 15 A 85 55 0 0 1 150 60" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-        </svg>
-      `;
+
+      const bowlSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="110" viewBox="0 0 200 110">
+        <defs>
+          <linearGradient id="glassGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="20%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="50%" stop-color="#e1f5fe" stop-opacity="0.75"/>
+            <stop offset="80%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95"/>
+          </linearGradient>
+          <pattern id="frostPattern" width="3" height="3" patternUnits="userSpaceOnUse">
+            <circle cx="1.5" cy="1.5" r="1" fill="rgba(255, 255, 255, 0.4)"/>
+          </pattern>
+        </defs>
+        <path d="M 65 100 L 135 100 C 142 100 145 102 145 105 L 145 108 C 145 109 144 110 142 110 L 58 110 C 56 110 55 109 55 108 L 55 105 C 55 102 58 100 65 100 Z" fill="rgba(255,255,255,0.85)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+        <rect x="90" y="68" width="20" height="34" fill="rgba(255,255,255,0.85)"/>
+        <line x1="90" y1="70" x2="90" y2="100" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+        <line x1="110" y1="70" x2="110" y2="100" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+        <path d="M 5 0 L 195 0 A 5 5 0 0 1 200 5 A 100 65 0 0 1 0 5 A 5 5 0 0 1 5 0 Z" fill="url(#glassGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
+        <path d="M 5 0 L 195 0 A 5 5 0 0 1 200 5 A 100 65 0 0 1 0 5 A 5 5 0 0 1 5 0 Z" fill="url(#frostPattern)"/>
+        <path d="M 15 15 A 85 55 0 0 0 50 60" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 185 15 A 85 55 0 0 1 150 60" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      </svg>`;
+
+      bowlContainer.innerHTML = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(bowlSvg)}" style="width: 100%; height: 100%; display: block;" alt="bowl" />`;
 
       const existingToppings = visualContainer.querySelectorAll('.topping-item, .topping-stick, .topping-syrup');
       existingToppings.forEach(el => el.remove());
