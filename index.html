@@ -663,12 +663,16 @@ const syrupsPreset = [
       const edgeToppingsList = []; 
       const MAX_TOTAL_FRUITS = 12;
 
+      let availableToppings = [...toppingsPreset];
+
       names.forEach((name, index) => {
         const mySeed = getHash(groupHashString + '_' + name + '_' + index);
         const rand = createRandomGenerator(mySeed);
-
-        const toppingIndex = Math.floor(rand() * toppingsPreset.length);
-        const selectedTopping = toppingsPreset[toppingIndex];
+        const toppingIndex = Math.floor(rand() * availableToppings.length);
+        const selectedTopping = availableToppings[toppingIndex];
+        if (selectedTopping.type === 'top-point') {
+          availableToppings.splice(toppingIndex, 1);
+        }
 
         const listIconSvg = selectedTopping.svgs ? selectedTopping.svgs[0] : selectedTopping.svg;
         const particle = getParticle(selectedTopping.name);
