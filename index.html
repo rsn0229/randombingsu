@@ -622,7 +622,6 @@
       bowlElement.style.height = '100%';
       bowlElement.style.display = 'block';
 
-      // ✨ 누락되었던 얼음 이미지 코드를 다시 추가했습니다!
       const iceSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 135" width="180" height="135">
         <defs>
           <radialGradient id="iceGrad" cx="35%" cy="30%" r="75%">
@@ -897,10 +896,8 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
-function downloadImage(useFallback = false) {
-  const captureWrapper = document.getElementById('capture-wrapper');
-  const isOldDevice = /iPhone OS [0-9]_|iPad/i.test(navigator.userAgent) || window.innerWidth < 400;
-  const captureScale = isOldDevice ? 1 : 2;
+    function downloadImage(useFallback = false) {
+      const captureWrapper = document.getElementById('capture-wrapper'); 
       const modalScroll = document.getElementById('modalScroll');        
       const actionButtons = document.getElementById('actionButtons');    
       
@@ -931,13 +928,13 @@ function downloadImage(useFallback = false) {
         captureArea.style.backgroundImage = 'none';
       }
       
-setTimeout(() => {
-    html2canvas(captureWrapper, {
-      backgroundColor: currentOuterBgColor,
-      scale: captureScale,
-      useCORS: true,
-      windowWidth: 640
-    }).then(canvas => {
+      setTimeout(() => {
+        html2canvas(captureWrapper, {
+          backgroundColor: currentOuterBgColor, 
+          scale: 2, 
+          useCORS: true,
+          windowWidth: 640
+        }).then(canvas => {
           const link = document.createElement('a');
           link.download = '우리의_빙수.png';
           link.href = canvas.toDataURL('image/png');
@@ -954,7 +951,7 @@ setTimeout(() => {
             captureArea.style.backgroundImage = originalCaptureBg || '';
           }
           actionButtons.style.display = 'flex'; 
-          }).catch(err => {
+        }).catch(err => {
           console.error('이미지 저장 중 오류 발생:', err);
           alert('이미지 저장에 실패했습니다. 다시 시도해 주세요!');
           
@@ -969,17 +966,9 @@ setTimeout(() => {
             captureArea.style.backgroundImage = originalCaptureBg || '';
           }
           actionButtons.style.display = 'flex';
-    }).catch(err => {
-      if(captureScale === 2) {
-         console.log("고해상도 실패, 해상도를 낮춰 재시도합니다.");
-         downloadImage(useFallback); 
-      } else {
-         alert('이미지 저장에 실패했습니다.');
-         actionButtons.style.display = 'flex';
-      }
-    });
-  }, 100);
-}
+        });
+      }, 100);
+    }
   </script>
 </body>
 </html>
