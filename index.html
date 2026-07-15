@@ -169,6 +169,17 @@
     }
     .modal-scroll::-webkit-scrollbar { display: none; }
 
+    .img-scroll-container {
+      max-height: 55vh;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      scrollbar-width: none; /* Firefox */
+    }
+    .img-scroll-container::-webkit-scrollbar { 
+      display: none; /* Chrome, Safari, Opera */
+    }
+
     #capture-area {
       background-color: #f4fbff;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
@@ -283,20 +294,6 @@
       flex-direction: column;
       width: 100%;
     }
-
-    .fallback-link {
-      font-size: 0.8rem;
-      color: #9ba6b2;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      text-align: center;
-      margin-top: 5px;
-      cursor: pointer;
-      transition: color 0.3s;
-    }
-    .fallback-link:hover {
-      color: #6a7c8e;
-    }
   </style>
 </head>
 <body>
@@ -337,9 +334,8 @@
           </div>
           
           <div class="action-buttons" id="actionButtons">
-            <button class="btn-download" onclick="downloadImage(false)">추억 남기기</button>
+            <button class="btn-download" onclick="downloadImage()">추억 남기기</button>
             <button class="btn-close" onclick="closeModal()">닫기</button>
-            <a href="#" class="fallback-link" onclick="downloadImage(true); return false;">이미지가 까맣게 저장되는 경우(다운로드)</a>
           </div>
         </div>
       </div>
@@ -622,7 +618,6 @@
       bowlElement.style.height = '100%';
       bowlElement.style.display = 'block';
 
-      // ✨ 누락되었던 얼음 이미지 코드를 다시 추가했습니다!
       const iceSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 135" width="180" height="135">
         <defs>
           <radialGradient id="iceGrad" cx="35%" cy="30%" r="75%">
@@ -897,107 +892,93 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
-function downloadImage(useFallback = false, captureScale = 2) {
-  const captureWrapper = document.getElementById('capture-wrapper');
-  const iceContainer = document.getElementById('iceContainer'); 
-  const modalScroll = document.getElementById('modalScroll');        
-  const actionButtons = document.getElementById('actionButtons');    
-  
-  const paperNote = captureWrapper.querySelector('.modal-content.paper-note');
-  const captureArea = captureWrapper.querySelector('#capture-area');
-  const originalMaxHeight = modalScroll.style.maxHeight;
-  const originalOverflow = modalScroll.style.overflowY;
-  const originalWidth = captureWrapper.style.width;
-  const originalMaxWidth = captureWrapper.style.maxWidth;
-  const originalPadding = captureWrapper.style.padding;
-  
-  let originalPaperBg = '';
-  let originalCaptureBg = '';
+    function downloadImage(captureScale = 2) {
+      const captureWrapper = document.getElementById('capture-wrapper');
+      const modalScroll = document.getElementById('modalScroll');        
+      const actionButtons = document.getElementById('actionButtons');    
+      
+      const originalMaxHeight = modalScroll.style.maxHeight;
+      const originalOverflow = modalScroll.style.overflowY;
+      const originalWidth = captureWrapper.style.width;
+      const originalMaxWidth = captureWrapper.style.maxWidth;
+      const originalPadding = captureWrapper.style.padding;
+      
+      modalScroll.style.maxHeight = 'none';
+      modalScroll.style.overflowY = 'visible';
+      actionButtons.style.display = 'none';
 
-  modalScroll.style.maxHeight = 'none';
-  modalScroll.style.overflowY = 'visible';
-  actionButtons.style.display = 'none';
+      captureWrapper.style.width = '640px';
+      captureWrapper.style.maxWidth = '640px';
+      captureWrapper.style.padding = '60px 80px';
+      
+      setTimeout(() => {
+        html2canvas(captureWrapper, {
+          backgroundColor: currentOuterBgColor, 
+          scale: captureScale, 
+          useCORS: true,
+          windowWidth: 640
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          
+          if (isMobile) {
+            showSaveGuideOverlay(imgData); 
+          } else {
+            const link = document.createElement('a');
+            link.download = '우리의_빙수.png';
+            link.href = imgData;
+            link.click();
+          }
+          
+          restoreStyles(); 
+          
+        }).catch(err => {
+          console.warn('캡처 중 오류 발생:', err);
+          alert('이미지 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+          restoreStyles();
+        });
+      }, 100);
 
-  captureWrapper.style.width = '640px';
-  captureWrapper.style.maxWidth = '640px';
-  captureWrapper.style.padding = '60px 80px';
-
-  if (useFallback) {
-    originalPaperBg = paperNote.style.backgroundImage;
-    originalCaptureBg = captureArea.style.backgroundImage;
-    paperNote.style.backgroundImage = 'none';
-    captureArea.style.backgroundImage = 'none';
-  }
-  
-  setTimeout(() => {
-    const wrapperRect = captureWrapper.getBoundingClientRect();
-    const iceRect = iceContainer.getBoundingClientRect();
-
-    html2canvas(captureWrapper, {
-      backgroundColor: currentOuterBgColor, 
-      scale: captureScale, 
-      useCORS: true,
-      windowWidth: 640
-    }).then(canvas => {
-      const ctx = canvas.getContext('2d');
-
-      const iceRelativeX = iceRect.left - wrapperRect.left;
-      const iceRelativeY = iceRect.top - wrapperRect.top;
-      const checkPoints = [
-        { x: iceRelativeX + (iceRect.width * 0.45), y: iceRelativeY + (iceRect.height * 0.65) },
-        { x: iceRelativeX + (iceRect.width * 0.50), y: iceRelativeY + (iceRect.height * 0.65) }, 
-        { x: iceRelativeX + (iceRect.width * 0.55), y: iceRelativeY + (iceRect.height * 0.65) } 
-      ];
-
-      const isBlackBug = checkPoints.every(pos => {
-        const canvasX = Math.floor(pos.x * captureScale);
-        const canvasY = Math.floor(pos.y * captureScale);
-
-        if (canvasX < 0 || canvasX >= canvas.width || canvasY < 0 || canvasY >= canvas.height) return false;
-
-        const pixel = ctx.getImageData(canvasX, canvasY, 1, 1).data;
-        return pixel[0] < 15 && pixel[1] < 15 && pixel[2] < 15;
-      });
-
-      if (isBlackBug) {
-        throw new Error('Black Image Detected on Ice Area (Safari Rendering Bug)');
+      function restoreStyles() {
+        modalScroll.style.maxHeight = originalMaxHeight || '';
+        modalScroll.style.overflowY = originalOverflow || '';
+        captureWrapper.style.width = originalWidth || '';
+        captureWrapper.style.maxWidth = originalMaxWidth || '';
+        captureWrapper.style.padding = originalPadding || '';
+        actionButtons.style.display = 'flex'; 
       }
-
-      const link = document.createElement('a');
-      link.download = '우리의_빙수.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      
-      restoreStyles(); 
-      
-    }).catch(err => {
-      console.warn('캡처 중 오류 또는 검정색 얼음 감지:', err);
-      
-      if (captureScale > 1) {
-        console.log('해상도를 낮춰서 자동으로 재시도합니다.');
-        restoreStyles(); 
-        downloadImage(useFallback, 1); 
-      } else {
-        alert('이미지 저장에 실패했습니다. (메모리 부족 또는 브라우저 호환성 문제일 수 있습니다)');
-        restoreStyles();
-      }
-    });
-  }, 100);
-
-  function restoreStyles() {
-    modalScroll.style.maxHeight = originalMaxHeight || '';
-    modalScroll.style.overflowY = originalOverflow || '';
-    captureWrapper.style.width = originalWidth || '';
-    captureWrapper.style.maxWidth = originalMaxWidth || '';
-    captureWrapper.style.padding = originalPadding || '';
-
-    if (useFallback) {
-      paperNote.style.backgroundImage = originalPaperBg || '';
-      captureArea.style.backgroundImage = originalCaptureBg || '';
     }
-    actionButtons.style.display = 'flex'; 
-  }
-}
-</script>
+
+    function showSaveGuideOverlay(imgSrc) {
+      let overlay = document.getElementById('save-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'save-overlay';
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(43, 58, 66, 0.85); backdrop-filter: blur(5px);
+          z-index: 200; display: flex; flex-direction: column; 
+          align-items: center; justify-content: center;
+          padding: 20px; box-sizing: border-box;
+        `;
+        document.body.appendChild(overlay);
+      }
+
+      overlay.innerHTML = `
+        <div class="paper-note" style="max-width: 500px; padding: 2rem 1.5rem; text-align: center;">
+          <div class="masking-tape"></div>
+          <p style="margin-top: 0; margin-bottom: 1rem; color: #4d4b47; font-weight: bold; font-size: 1.1rem;">
+            이미지를 꾹 눌러서 저장해 주세요!
+          </p>
+          <div class="img-scroll-container">
+            <img src="${imgSrc}" style="width: 100%; height: auto; display: block;" alt="우리의 빙수">
+          </div>
+          <button class="btn-close" onclick="document.getElementById('save-overlay').style.display='none'">닫기</button>
+        </div>
+      `;
+      
+      overlay.style.display = 'flex';
+    }
+  </script>
 </body>
 </html>
