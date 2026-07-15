@@ -898,13 +898,13 @@
     }
 
 function downloadImage(useFallback = false, captureScale = 2) {
-  const captureWrapper = document.getElementById('capture-wrapper'); 
+  const captureWrapper = document.getElementById('capture-wrapper');
+  const iceContainer = document.getElementById('iceContainer'); 
   const modalScroll = document.getElementById('modalScroll');        
   const actionButtons = document.getElementById('actionButtons');    
   
   const paperNote = captureWrapper.querySelector('.modal-content.paper-note');
   const captureArea = captureWrapper.querySelector('#capture-area');
-
   const originalMaxHeight = modalScroll.style.maxHeight;
   const originalOverflow = modalScroll.style.overflowY;
   const originalWidth = captureWrapper.style.width;
@@ -928,14 +928,41 @@ function downloadImage(useFallback = false, captureScale = 2) {
     paperNote.style.backgroundImage = 'none';
     captureArea.style.backgroundImage = 'none';
   }
-
+  
   setTimeout(() => {
+    const wrapperRect = captureWrapper.getBoundingClientRect();
+    const iceRect = iceContainer.getBoundingClientRect();
+
     html2canvas(captureWrapper, {
       backgroundColor: currentOuterBgColor, 
-      scale: captureScale,
+      scale: captureScale, 
       useCORS: true,
       windowWidth: 640
     }).then(canvas => {
+      const ctx = canvas.getContext('2d');
+
+      const iceRelativeX = iceRect.left - wrapperRect.left;
+      const iceRelativeY = iceRect.top - wrapperRect.top;
+      const checkPoints = [
+        { x: iceRelativeX + (iceRect.width * 0.45), y: iceRelativeY + (iceRect.height * 0.65) },
+        { x: iceRelativeX + (iceRect.width * 0.50), y: iceRelativeY + (iceRect.height * 0.65) }, 
+        { x: iceRelativeX + (iceRect.width * 0.55), y: iceRelativeY + (iceRect.height * 0.65) } 
+      ];
+
+      const isBlackBug = checkPoints.every(pos => {
+        const canvasX = Math.floor(pos.x * captureScale);
+        const canvasY = Math.floor(pos.y * captureScale);
+
+        if (canvasX < 0 || canvasX >= canvas.width || canvasY < 0 || canvasY >= canvas.height) return false;
+
+        const pixel = ctx.getImageData(canvasX, canvasY, 1, 1).data;
+        return pixel[0] < 15 && pixel[1] < 15 && pixel[2] < 15;
+      });
+
+      if (isBlackBug) {
+        throw new Error('Black Image Detected on Ice Area (Safari Rendering Bug)');
+      }
+
       const link = document.createElement('a');
       link.download = '우리의_빙수.png';
       link.href = canvas.toDataURL('image/png');
@@ -944,14 +971,14 @@ function downloadImage(useFallback = false, captureScale = 2) {
       restoreStyles(); 
       
     }).catch(err => {
-      console.warn('고화질 캡처 중 오류 발생:', err);
+      console.warn('캡처 중 오류 또는 검정색 얼음 감지:', err);
       
       if (captureScale > 1) {
         console.log('해상도를 낮춰서 자동으로 재시도합니다.');
         restoreStyles(); 
         downloadImage(useFallback, 1); 
       } else {
-        alert('이미지 저장에 실패했습니다. 메모리가 부족하거나 브라우저 설정 때문일 수 있습니다.');
+        alert('이미지 저장에 실패했습니다. (메모리 부족 또는 브라우저 호환성 문제일 수 있습니다)');
         restoreStyles();
       }
     });
